@@ -43,15 +43,15 @@ const addTask = (request, response) => {
 app.get('/', (req, res) => {
     res.send("Hello World");
 })
-// app.get('/tasks', getTasks);
-// app.post('/tasks', addTask);
+app.get('/tasks', getTasks);
+app.post('/tasks', addTask);
 
-app
-  .route('/tasks')
-  // GET endpoint
-  .get(getTasks)
-  // POST endpoint
-  .post(addTask)
+// app
+//   .route('/tasks')
+//   // GET endpoint
+//   .get(getTasks)
+//   // POST endpoint
+//   .post(addTask)
 
 // Start server
 app.listen(process.env.PORT || 3002, () => {

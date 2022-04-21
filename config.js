@@ -12,19 +12,4 @@ const pool = new Pool({
     },
 })
 
-// const pool = (() => {
-//   if (process.env.NODE_ENV !== 'production') {
-//       return new Pool({
-//           connectionString: connectionString,
-//           ssl: false
-//       });
-//   } else {
-//       return new Pool({
-//           connectionString: connectionString,
-//           ssl: {
-//               rejectUnauthorized: false
-//             }
-//       });
-//   } })();
-
 module.exports = { pool }
