@@ -87,7 +87,7 @@ module.exports = (app, pool) => {
         }
         res
           .status(201)
-          .json({ status: "success", message: "Task Reminder Updated.", result: result });
+          .json({ status: "success", message: "Task Reminder Updated." });
       }
     );
   };
