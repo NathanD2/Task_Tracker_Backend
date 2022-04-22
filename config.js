@@ -9,7 +9,9 @@ const pool = new Pool({
   connectionString: isProduction ? process.env.DATABASE_URL : connectionString,
   ssl: {
     rejectUnauthorized: false
-    },
+    }
 })
+// ssl for local testing below.
+// ssl: process.env.DATABASE_URL ? true : false
 
 module.exports = { pool }
