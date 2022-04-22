@@ -44,7 +44,7 @@ module.exports = (app, pool) => {
         }
         response
           .status(201)
-          .json({ task: result });
+          .json({ task: result.rows[0] });
       }
     );
   };
