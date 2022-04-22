@@ -9,13 +9,13 @@ app.use(express.urlencoded({ extended: true }))
 
 // If production build, app can only be accessed by our own domain.
 // const isProduction = process.env.NODE_ENV === 'production'
-const origin = {
-    origin: '*',
-    // origin: isProduction ? '*' : '*',
-}
+// const origin = {
+//     origin: isProduction ? '*' : '*',
+//     // origin: isProduction ? '*' : '*',
+// }
 
-app.use(cors(origin))
-// app.use(cors());
+// app.use(cors(origin))
+app.use(cors());
 
 // Version 1
 require('./version/v1')(app, pool);
