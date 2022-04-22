@@ -36,15 +36,15 @@ module.exports = (app, pool) => {
     const { task, date_time, reminder } = request.body;
 
     pool.query(
-      "INSERT INTO tasks (task, date_time, reminder) VALUES ($1, $2, $3)",
+      "INSERT INTO tasks (task, date_time, reminder) VALUES ($1, $2, $3) RETURNING id",
       [task, date_time, reminder],
-      (error) => {
+      (error, result) => {
         if (error) {
           throw error;
         }
         response
           .status(201)
-          .json({ status: "success", message: "Task added." });
+          .json({ status: "success", message: "Task added.", id: result });
       }
     );
   };
