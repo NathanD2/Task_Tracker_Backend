@@ -36,7 +36,7 @@ module.exports = (app, pool) => {
     const { task, date_time, reminder } = request.body;
 
     pool.query(
-      "INSERT INTO tasks (task, date_time, reminder) VALUES ($1, $2, $3) RETURNING id",
+      "INSERT INTO tasks (task, date_time, reminder) VALUES ($1, $2, $3) RETURNING *",
       [task, date_time, reminder],
       (error, result) => {
         if (error) {
@@ -44,7 +44,7 @@ module.exports = (app, pool) => {
         }
         response
           .status(201)
-          .json({ status: "success", message: "Task added.", id: result });
+          .json({ task: result });
       }
     );
   };
