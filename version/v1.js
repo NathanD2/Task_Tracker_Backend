@@ -79,15 +79,15 @@ module.exports = (app, pool) => {
     const { id, reminder } = req.body;
 
     pool.query(
-      "UPDATE tasks SET reminder = $2 WHERE id = $1",
+      "UPDATE tasks SET reminder = $2 WHERE id = $1 RETURNING *",
       [id, reminder],
-      (error) => {
+      (error, result) => {
         if (error) {
           throw error;
         }
         res
           .status(201)
-          .json({ status: "success", message: "Task Reminder Updated." });
+          .json({ status: "success", message: "Task Reminder Updated.", result: result });
       }
     );
   };
