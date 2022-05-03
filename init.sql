@@ -1,3 +1,5 @@
+DROP IF EXISTS tasks;
+
 CREATE TABLE tasks (
   ID bigserial PRIMARY KEY,
   task VARCHAR(255) NOT NULL,
@@ -8,4 +10,11 @@ CREATE TABLE tasks (
   created_at TIMESTAMPTZ DEFAULT Now()
 );
 
-INSERT INTO tasks (task, date_time, reminder, userid) VALUES ('task', 'date_time', TRUE, 1);
+DROP IF EXISTS users;
+CREATE TABLE users (
+  "id" bigserial PRIMARY KEY,
+  "username" varchar(255) UNIQUE,
+  "password" varchar(100),
+  created_at TIMESTAMPTZ DEFAULT Now(),
+  "sessionid" text DEFAULT md5(random()::text)
+);

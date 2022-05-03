@@ -1,26 +1,24 @@
-// const res = require("express/lib/response");
-// const { resolve } = require("path");
-// const { user } = require("pg/lib/defaults");
+const bcrypt = require('bcrypt')
 
 module.exports = (app, pool) => {
 
+  const saltRounds = 10;
   const version = '/v2';
   
   // ======================
   // Get Requests
   // ======================
 
-  // Gets all tasks
+  // Gets all tasks. Verified using user "session" data.
   const getTasks = (req, res) => {
     const { username, userid, sessionid } = req.body;
-    console.log("Stuff:", username, userid, sessionid);
     pool.query("SELECT * FROM users WHERE username = $1 AND id = $2 AND sessionid = $3",
     [username, userid, sessionid],
     (error, results) => {
       if (error) {
         throw error;
       }
-      // Check "session" auth. If no matching users
+      // Check "session" auth. If no matching users, return status 401.
       if (results.rows.length == 0) {
         res.sendStatus(401);
         return;
@@ -95,7 +93,7 @@ module.exports = (app, pool) => {
   }
 
   // Add a new user
-  const addUser = async (req, res) => {
+  const addUser = (req, res) => {
     const { username, password } = req.body;
 
     // Query to check if username already exists.
@@ -109,29 +107,90 @@ module.exports = (app, pool) => {
 
         // If user name isn't taken, add new user.
         if (usersWithUsername.rows.length == 0) {
-          pool.query(
-          "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
-          [username, password],
-          (error, results) => {
-            if (error) {
-              throw error;
-            }
-            const user = results.rows[0];
 
-            // Send back "session" for session storage.
-            res.status(201).json({
-              username: user.username,
-              userid: user.id,
-              sessionid: user.sessionid
-            });
-          }
-        );
+          // Hash Password
+          bcrypt.hash(password, saltRounds, function(err, hash) {
+
+            // Add user and hashed password to db.
+            pool.query(
+            "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
+            [username, hash],
+            (error, results) => {
+              if (error) {
+                throw error;
+              }
+              console.log("User:", username, "added to database.");
+              const user = results.rows[0];
+
+              // Send back "session" for session storage.
+              res.status(201).json({
+                username: user.username,
+                userid: user.id,
+                sessionid: user.sessionid
+              });
+            }
+          );
+          })
+
+          
         } else {
           res.status(401);
         }
         
       }
     );
+  };
+
+  const authUser = (req, res) => {
+    // Capture the input fields
+    const { username, password } = req.body;
+
+    console.log("Login:", username);
+
+    // Ensure the input fields exists and are not empty
+    if (username && password) {
+
+      pool.query(
+        "SELECT * FROM users WHERE username = $1",
+        [ username ],
+        (error, result) => {
+          if (error) {
+            throw error;
+          }
+
+          // Check Password and sessionid
+          if (result.rows.length > 0) {
+            const user = result.rows[0];
+            
+            bcrypt.compare(password, user.password).then((result => {
+
+              // If password matches with hash, return "session" with status 200.
+              if (result) {
+                console.log("Successful Login:", username);
+                res.status(200)
+                  .json( {
+                    username: user.username,
+                    userid: user.id,
+                    sessionid: user.sessionid
+                  });
+              } else {
+                console.log("Unsuccessful Login:", username);
+                res.status(401).json({status: "Incorrect username or password"})
+              }
+            }));
+          }
+
+          // If username doesn't exist
+          else {
+            res.status(401).json({status: "Incorrect username or password"});
+          }
+          
+        }
+      );
+    } else {
+      // Username and/or Password empty in req body.
+      res.status(401).json({status: 'Please enter Username and Password!'});
+    }
   };
 
 
@@ -216,48 +275,7 @@ module.exports = (app, pool) => {
   app.post(version + "/addtask", addTask);
   app.post(version + "/adduser", addUser);
 
-  app.post(version + '/auth', function(req, res) {
-    // Capture the input fields
-    const { username, password } = req.body;
-
-    console.log("Login:", username, password);
-
-    // Ensure the input fields exists and are not empty
-    if (username && password) {
-
-      pool.query(
-        "SELECT * FROM users WHERE username = $1",
-        [ username ],
-        (error, result) => {
-          if (error) {
-            throw error;
-          }
-
-          // Check Password and sessionid
-          if (result.rows.length > 0
-            && result.rows[0].password == password) {
-
-            console.log("ID:", result.rows[0].id);
-            res
-            .status(200)
-            .json( {
-              username: result.rows[0].username,
-              userid: result.rows[0].id,
-              sessionid: result.rows[0].sessionid
-            } );
-
-          }
-          else {
-            res.status(401).send('Incorrect username or password');
-          }
-          
-        }
-      );
-    } else {
-      res.send('Please enter Username and Password!');
-      // resolve.end();
-    }
-  });
+  app.post(version + '/auth', authUser);
 
   // ======================
   // Delete Requests
