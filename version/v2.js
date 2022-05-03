@@ -30,7 +30,7 @@ module.exports = (app, pool) => {
         if (error) {
           throw error;
         }
-        res.status(200).json(results.rows);
+        res.status(200).json({tasks: results.rows[0]});
       });
     });
   };
