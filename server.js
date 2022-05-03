@@ -19,13 +19,13 @@ app.use(express.urlencoded({ extended: true }))
 app.use(helmet());
 
 // If production build, app can only be accessed by our own domain.
-const origin = {
-    origin: isProduction ? 'https://nathantasktracker.herokuapp.com/' : '*',
-    // origin: isProduction ? '*' : '*',
-}
+// const origin = {
+//     origin: isProduction ? 'https://nathantasktracker.herokuapp.com/' : '*',
+//     // origin: isProduction ? '*' : '*',
+// }
 
-app.use(cors(origin))
-// app.use(cors());
+// app.use(cors(origin))
+app.use(cors());
 
 
 // Version 1
