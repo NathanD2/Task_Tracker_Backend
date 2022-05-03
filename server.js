@@ -1,5 +1,7 @@
 const express = require('express')
 const cors = require('cors')
+const helmet = require("helmet");
+
 const app = express()
 
 
@@ -14,29 +16,11 @@ const { pool } = require('./db/config')
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-
-// Session lifetime 1000ms * 60s * 5min
-// const sessionAge = 1000 * 5;
-// const sessionAge = 1000 * 60 * .5;
-
-// app.use(session({
-// 	secret: 'secret12345qwerty',
-// 	resave: true,
-// 	saveUninitialized: true,
-// 	cookie: {
-// 		maxAge: sessionAge,
-// 		domain: isProduction ? "https://nathantasktracker.herokuapp.com/" : "localhost:5000",
-// 		// path:"/v2",
-//         path: '/',
-// 		// secure: "true"
-// 	},
-// }));
-
+app.use(helmet());
 
 // If production build, app can only be accessed by our own domain.
-// const isProduction = process.env.NODE_ENV === 'production'
 const origin = {
-    origin: isProduction ? '*' : '*',
+    origin: isProduction ? 'https://nathantasktracker.herokuapp.com/' : '*',
     // origin: isProduction ? '*' : '*',
 }
 
