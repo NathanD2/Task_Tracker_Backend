@@ -1,4 +1,6 @@
 module.exports = (app, pool) => {
+
+  const version = '/v1';
   
   // ======================
   // Get Requests
@@ -93,7 +95,7 @@ module.exports = (app, pool) => {
   };
 
   app.get("/", (req, res) => {
-    res.send("Hello World");
+    res.send(JSON.stringify(req.session));
   });
 
   // Wake up heroku server
@@ -105,24 +107,25 @@ module.exports = (app, pool) => {
   // Get Requests
   // ======================
 
-  app.get("/tasks", getTasks);
-  app.get("/task/:taskId", getTask);
+  app.get(version + "/tasks", getTasks);
+  app.get(version + "/task/:taskId", getTask);
 
   // ======================
   // Post Requests
   // ======================
 
-  app.post("/addtask", addTask);
+  app.post(version + "/addtask", addTask);
 
   // ======================
   // Delete Requests
   // ======================
 
-  app.delete("/delete", deleteTask);
+  app.delete(version + "/delete", deleteTask);
 
   // ======================
   // Put Requests
   // ======================
   
-  app.put("/setreminder", setReminder);
+  app.put(version + "/setreminder", setReminder);
+  
 };
