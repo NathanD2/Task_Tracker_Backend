@@ -1,4 +1,4 @@
-DROP IF EXISTS tasks;
+DROP TABLE IF EXISTS tasks;
 
 CREATE TABLE tasks (
   ID bigserial PRIMARY KEY,
@@ -10,7 +10,7 @@ CREATE TABLE tasks (
   created_at TIMESTAMPTZ DEFAULT Now()
 );
 
-DROP IF EXISTS users;
+DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   "id" bigserial PRIMARY KEY,
   "username" varchar(255) UNIQUE,
